@@ -15,7 +15,7 @@
 # limitations under the License.
 
 # Constants
-VERSION="0.1.0"
+VERSION="0.2.0"
 RELEASE_DATE="2024-09-15"
 SCRIPT_NAME=$(basename "$0")
 
@@ -25,6 +25,7 @@ directory="."
 extension=''
 content=""
 auto_open=0
+datetime=0
 
 function show_help {
     echo "Generates a file named <current_date>_<file-name> where <current_date> is today's date using the 'yyyy-MM-dd' format and <file-name> is the specified filename."
@@ -33,15 +34,30 @@ function show_help {
     echo "If no filename is specified, the name of the created file will be the current date"
     echo
     echo "Usage:"
-    echo "  ${SCRIPT_NAME} [filename] [-deocvih]"
-    echo "Options:"
-    echo "  -e, --extension=extension  Specify the desired extension (no extension by default)"
-    echo "  -d, --directory=directory  The directory where the file will be generated"
+    echo ""
+    echo "  ${SCRIPT_NAME} [filename] [-cdeot][-ihv]"
+    echo ""
+    echo "Examples:"
+    echo ""
+    echo "  mkf                      # Generate a file using the current date as its name."
+    echo "  mkf -e log               # Generate a file with .log extension"
+    echo "  mkf hello.log            # Generate a file with .log extension"
+    echo "  mkf hello.log -d ~/logs  # Generate a file in home/username/logs"
+    echo "  sudo mkf -e log -d / -t  # Generate a file in the root directory with a datetime prefix and .log extension"
+    echo ""
+    echo "Main operation mode:"
+    echo ""
     echo "  -c, --content=content      The content to write in this file"
+    echo "  -d, --directory=directory  The directory where the file will be generated"
+    echo "  -e, --extension=extension  Specify the desired extension (no extension by default)"
     echo "  -o, --open                 Automatically opens the file upon generation."
-    echo "  -v, --version              Print the command version"
+    echo "  -t, --time                 Uses a datetime prefix instead of a date prefix."
+    echo ""
+    echo "Information output:"
+    echo ""
     echo "  -i, --info                 Provide info about this software: version, release date, author"
     echo "  -h, --help                 Display this help message and exit"
+    echo "  -v, --version              Print the command version"
 }
 
 function print_version {
@@ -109,7 +125,7 @@ while [[ $# -gt 0 ]]; do
             extension=".${1#*=}"
             shift
             ;;
-        -e)  # Added entry for the short version of --extension
+        -e)
             if [[ -n "$2" && "$2" != -* ]]; then
                 extension=".$2"
                 shift 2  # Shift past both -e and the extension
@@ -128,13 +144,13 @@ while [[ $# -gt 0 ]]; do
             content="$2"
             shift 2
             ;;
-        --open)
+        -o|--open)
             auto_open=1
             shift
             ;;
-        -o)
-            auto_open=1
-            shift 1
+        -t|--time)
+            datetime=1
+            shift
             ;;
         -h|--help)
             show_help
@@ -175,6 +191,10 @@ cd "$directory" || exit
 
 formatted_filename=''
 formatted_date="$(date +%Y-%m-%d)"
+
+if [[ $datetime -eq 1 ]]; then
+    formatted_date="$(date +%Y-%m-%d_%H-%M-%S)"
+fi
 
 if [[ -n "$filename" ]]; then
     formatted_filename="${formatted_date}_${filename}${extension}"

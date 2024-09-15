@@ -1,8 +1,8 @@
 # mkf (make file)
 
-A simple bash command that generates files prefixed with the date in ISO format.
+Generates files prefixed with the current date in ISO format.
 
-The filenames follow this structure: `\<current_date\>_\<file-name\>.\<extension\>`
+The filenames follow this structure: `<current_date>_<file-name>.<extension>`
 
 Where 
 - `current_date` represents today's date in the ISO `yyyy-MM-dd` format
@@ -15,6 +15,12 @@ Where
 ```
 ➜ mkf
 created: 2024-09-15 in: /home/username/programming/command-mkf
+```
+
+#### Create a file with current datetime as prefix
+```
+➜ mkf -t
+created: 2024-09-15_11-32-54 in: /home/username/programming/command-mkf
 ```
 
 #### Create a file with default title and .log extension
@@ -51,15 +57,21 @@ Here is the output of `mkf -h`, showing all available options:
 
 ```
 Usage:
-  mkf [filename] [-deocvih]
-Options:
-  -e, --extension=extension  Specify the desired extension (no extension by default)
-  -d, --directory=directory  The directory where the file will be generated
+  mkf [filename] [-cdeot][-ihv]
+
+Main operation mode:
+
   -c, --content=content      The content to write in this file
+  -d, --directory=directory  The directory where the file will be generated
+  -e, --extension=extension  Specify the desired extension (no extension by default)
   -o, --open                 Automatically opens the file upon generation.
-  -v, --version              Print the command version
-  -i, --info                 Provide info about this software: version, release date, author
+  -t, --time                 Uses a datetime prefix instead of a date prefix.
+  
+Information output:
+  
   -h, --help                 Display this help message and exit
+  -i, --info                 Provide info about this software: version, release date, author
+  -v, --version              Print the command version
 ```
 
 ## Install
@@ -74,7 +86,7 @@ Confirm `mkf` is installed:
 
 ```
 ➜ mkf -v
-mkf version 0.1.0 [2024-09-15]
+mkf version 0.2.0 [2024-09-15]
 ```
 
 ## License
