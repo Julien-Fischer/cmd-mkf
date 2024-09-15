@@ -1,0 +1,200 @@
+#!/bin/bash
+
+# Copyright 2024 Julien Fischer
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Constants
+VERSION="0.1.0"
+RELEASE_DATE="2024-09-15"
+SCRIPT_NAME=$(basename "$0")
+
+# Default values
+filename=''
+directory="."
+extension=''
+content=""
+auto_open=0
+
+function show_help {
+    echo "Generates a file named <current_date>_<file-name> where <current_date> is today's date using the 'yyyy-MM-dd' format and <file-name> is the specified filename."
+    echo "Example: if today's date is sept. 15, 2024, '${SCRIPT_NAME} report' would create a file name '2024-09-15_report'."
+    echo "If no directory is specified, this command creates the file in the current working directory."
+    echo "If no filename is specified, the name of the created file will be the current date"
+    echo
+    echo "Usage:"
+    echo "  ${SCRIPT_NAME} [filename] [-deocvih]"
+    echo "Options:"
+    echo "  -e, --extension=extension  Specify the desired extension (no extension by default)"
+    echo "  -d, --directory=directory  The directory where the file will be generated"
+    echo "  -c, --content=content      The content to write in this file"
+    echo "  -o, --open                 Automatically opens the file upon generation."
+    echo "  -v, --version              Print the command version"
+    echo "  -i, --info                 Provide info about this software: version, release date, author"
+    echo "  -h, --help                 Display this help message and exit"
+}
+
+function print_version {
+    echo "${SCRIPT_NAME} version ${VERSION} [${RELEASE_DATE}]"
+}
+
+function get_absolute_path {
+    local input_path="$1"
+
+    # Handle '~' for home directory
+    if [[ "$input_path" == "~"* ]]; then
+        input_path="${input_path/#\~/$HOME}"
+    fi
+
+    # Use readlink or realpath to get the absolute path
+    if command -v realpath >/dev/null 2>&1; then
+        echo "$(realpath -m -- "$input_path")"
+    else
+        echo "$(readlink -f -- "$input_path")"
+    fi
+}
+
+function create_file {
+    if [[ -n "$content" ]]; then
+        echo "$content" > "$formatted_filename"
+    else
+        > $formatted_filename
+    fi
+    # Output results
+    echo "created: ${formatted_filename} in: ${directory}"
+    if [[ $auto_open -eq 1 ]]; then
+        xdg-open "$formatted_filename" &
+        disown
+        echo "opening ${formatted_filename}"
+    fi
+}
+
+
+# Check for positional argument for filename
+if [[ $# -gt 0 && ($1 != -* || $1 == "--") ]]; then
+    filename="$1"
+    shift
+fi
+
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --directory=*)
+            directory="${1#*=}"
+            shift
+        ;;
+        -d)
+            if [[ -n "$2" && "$2" != -* ]]; then
+                directory="$2"
+                shift 2  # Shift past both -d and the directory
+            else
+                echo "${SCRIPT_NAME}: Option -d requires an argument."
+                echo
+                show_help
+                exit 1
+            fi
+        ;;
+        --extension=*)
+            extension=".${1#*=}"
+            shift
+            ;;
+        -e)  # Added entry for the short version of --extension
+            if [[ -n "$2" && "$2" != -* ]]; then
+                extension=".$2"
+                shift 2  # Shift past both -e and the extension
+            else
+                echo "${SCRIPT_NAME}: Option -e requires an argument."
+                echo
+                show_help
+                exit 1
+            fi
+            ;;
+        --content=*)
+            content="${1#*=}"
+            shift
+        ;;
+        -c)
+            content="$2"
+            shift 2
+            ;;
+        --open)
+            auto_open=1
+            shift
+            ;;
+        -o)
+            auto_open=1
+            shift 1
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -v|--version)
+            print_version
+            exit 0
+            ;;
+        -i|--info)
+            print_version
+            echo "Author: Julien Fischer <julien.fischer@agiledeveloper.net>"
+            echo "For help, use ${SCRIPT_NAME} --help or ${SCRIPT_NAME} -h"
+            exit 0
+            ;;
+        *)  # Catch-all for invalid options
+            echo "${SCRIPT_NAME}: Invalid option: $1"
+            echo
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
+# Resolve the directory path
+directory=$(get_absolute_path "$directory")
+
+# Check if the provided directory path does not exist
+if [ ! -e "${directory}" ]; then
+    echo "${SCRIPT_NAME}: The specified directory does not exist: ${directory}"
+    echo
+    show_help
+    exit 1
+fi
+
+cd "$directory" || exit
+
+
+formatted_filename=''
+formatted_date="$(date +%Y-%m-%d)"
+
+if [[ -n "$filename" ]]; then
+    formatted_filename="${formatted_date}_${filename}${extension}"
+elif [[ "$extension" ]]; then
+    formatted_filename="${formatted_date}${extension}"
+else
+    formatted_filename="$formatted_date"
+fi
+
+
+if [[ -f "$formatted_filename" ]]; then
+    read -p "File '${formatted_filename}' already exists. Do you want to override it? (y/n): " choice
+    case "$choice" in
+        y|Y)
+            echo "Overriding existing file..."
+        ;;
+        n|N) echo "Operation aborted."; exit 1;;
+        *) echo "Invalid input. Operation aborted."; exit 1;;
+    esac
+fi;
+
+create_file
+
