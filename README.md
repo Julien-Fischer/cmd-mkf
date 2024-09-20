@@ -14,25 +14,32 @@ Where
 #### Create a file with default title and no extension
 ```
 ➜ mkf
-created: 2024-09-15 in: /home/username/programming/command-mkf
+created: 2024-09-15 in: /home/username/Desktop
 ```
 
 #### Create a file with current datetime as prefix
 ```
 ➜ mkf -t
-created: 2024-09-15_11-32-54 in: /home/username/programming/command-mkf
+created: 2024-09-15_11-32-54 in: /home/username/Desktop
 ```
 
 #### Create a file with default title and .log extension
 ```
 ➜ mkf -e txt
-created: 2024-09-15.txt in: /home/username/programming/command-mkf
+created: 2024-09-15.txt in: /home/username/Desktop
 ```
 
-#### Create a file in a specific directory
+#### Create a file in the parent directory and opens it in its default software
 ```
 ➜ mkf -d .. -e log
 created: 2024-09-15.log in: /home/username/programming
+```
+
+#### Create a file and opens it a specific software (e.g. VIM)
+```
+➜ mkf -o vim
+created: 2024-09-20 in: /home/username/Desktop
+opening 2024-09-20 in vim
 ```
 
 #### Create file with initial content
@@ -48,7 +55,7 @@ hello world!
 ➜ mkf hello.log
 File '2024-09-15_hello.log' already exists. Do you want to override it? (y/n): y
 Overriding existing file...
-created: 2024-09-15_hello.log in: /home/username/programming/command-mkf
+created: 2024-09-15_hello.log in: /home/username/Desktop
 ```
 
 ## Parameters
@@ -57,6 +64,7 @@ Here is the output of `mkf -h`, showing all available options:
 
 ```
 Usage:
+
   mkf [filename] [-cdeot][-ihv]
 
 Main operation mode:
@@ -64,7 +72,7 @@ Main operation mode:
   -c, --content=content      The content to write in this file
   -d, --directory=directory  The directory where the file will be generated
   -e, --extension=extension  Specify the desired extension (no extension by default)
-  -o, --open                 Automatically opens the file upon generation.
+  -o, --open[=software]      Automatically opens the file upon generation using default or specified software.
   -t, --time                 Uses a datetime prefix instead of a date prefix.
   
 Information output:
@@ -86,7 +94,7 @@ Confirm `mkf` is installed:
 
 ```
 ➜ mkf -v
-mkf version 0.2.0 [2024-09-15]
+mkf version 0.3.0 [2024-09-20]
 ```
 
 ## License
