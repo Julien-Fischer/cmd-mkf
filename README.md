@@ -1,13 +1,49 @@
 # mkf (make file)
 
-Generates files prefixed with the current date in ISO format.
+Save time by generating timestamped and preformatted files for your meeting minutes, logs, etc.
+This command is design to be simple to use and easily adaptable to your specific needs.
 
-The filenames follow this structure: `<current_date>_<file-name>.<extension>`
+## Features
 
-Where 
-- `current_date` represents today's date in the ISO `yyyy-MM-dd` format
-- `filename` is an optional name for the file
-- `extension` is an optional file extension
+- **Automatic File Generation**: Create files with a name based on the current date and time in ISO format.
+- **Customizable Templates**: Use preformatted templates to structure your documents, and create your owns.
+- **Time-saving**: Automate file creation for your meetings, logs, or any other documentation needs.
+
+## Customization
+
+You can customize the templates used by the script or create your own by adding them in the `/usr/local/share/mkf/templates` directory.
+
+
+## Prerequisites
+
+- **Operating System**: Linux (tested on Debian 12 and Kubuntu 24)
+- **Bash**: Ensure that Bash is installed on your system (usually installed by default on most Unix/Linux distributions)
+
+## Parameters
+
+Here is the output of `mkf -h`, showing all available options:
+
+```
+Usage:
+
+  mkf [filename] [-cdeotT][-ihv]
+
+Main operation mode:
+
+  -c, --content=content           The content to write in this file
+  -d, --directory=directory       The directory where the file will be generated
+  -e, --extension=extension       Specify the desired extension (no extension by default)
+  -o, --open[=software]           Automatically opens the file upon generation using default or specified software.
+  -t, --time                      Uses a datetime prefix instead of a date prefix.
+  -T, --template=[template_name]  Initializes the file using the specified template
+  
+Information output:
+  
+  -h, --help                      Display this help message and exit
+  -i, --info                      Provide info about this software: version, release date, author
+  -v, --version                   Print the command version
+```
+
 
 ## Examples
 
@@ -29,20 +65,14 @@ created: 2024-09-15_11-32-54 in: /home/username/Desktop
 created: 2024-09-15.txt in: /home/username/Desktop
 ```
 
-#### Create a file in the parent directory and opens it in its default software
-```
-➜ mkf -d .. -e log
-created: 2024-09-15.log in: /home/username/programming
-```
-
-#### Create a file and opens it a specific software (e.g. VIM)
+#### Create and open a file with specified software (e.g. VIM)
 ```
 ➜ mkf -o vim
 created: 2024-09-20 in: /home/username/Desktop
 opening 2024-09-20 in vim
 ```
 
-#### Create file with initial content
+#### Create a file with initial content
 ```
 ➜ mkf stats.log -d ~/logs -c "hello world!"
 created: 2024-09-15_stats.log in: /home/username/logs
@@ -50,53 +80,49 @@ created: 2024-09-15_stats.log in: /home/username/logs
 hello world!
 ```
 
-#### Erase an existing file
+#### Create a file from the specified template
 ```
-➜ mkf hello.log
-File '2024-09-15_hello.log' already exists. Do you want to override it? (y/n): y
-Overriding existing file...
-created: 2024-09-15_hello.log in: /home/username/Desktop
-```
-
-## Parameters
-
-Here is the output of `mkf -h`, showing all available options:
-
-```
-Usage:
-
-  mkf [filename] [-cdeot][-ihv]
-
-Main operation mode:
-
-  -c, --content=content      The content to write in this file
-  -d, --directory=directory  The directory where the file will be generated
-  -e, --extension=extension  Specify the desired extension (no extension by default)
-  -o, --open[=software]      Automatically opens the file upon generation using default or specified software.
-  -t, --time                 Uses a datetime prefix instead of a date prefix.
-  
-Information output:
-  
-  -h, --help                 Display this help message and exit
-  -i, --info                 Provide info about this software: version, release date, author
-  -v, --version              Print the command version
+➜ mkf important-meeting.txt -T meeting
+created: 2024-09-15_important-meeting.log in: /home/username/meetings
 ```
 
 ## Install
 
-### From Source
+### Using the Installer
 
-1. Clone this repository: `git clone https://github.com/Julien-Fischer/cmd-mkf`.
-2. Grant execution permissions: `cd cmd-mkf; chmod +x mkf`
-3. Move the script to user executables, for instance: `sudo mv mkf /usr/local/bin`
-
-Confirm `mkf` is installed:
+1. Download or clone this repository: `git clone https://github.com/Julien-Fischer/cmd-mkf`.
+2. Execute the installer `cd cmd-mkf/src; ./install.sh`
+3. Confirm `mkf` is installed:
 
 ```
 ➜ mkf -v
-mkf version 0.3.0 [2024-09-20]
+mkf version 0.4.0 [2024-09-22]
 ```
+
+## Uninstall
+
+To remove `mkf`, run the uninstallation wizard.
+```
+➜ cd /usr/local/bin; ./mkf-uninstall.sh
+This will uninstall mkf.
+Are you sure you want to proceed? (y/n): y
+Uninstalling...
+  Removing 2 templates:
+  - log
+  - meeting
+  Removing command files...
+    Removed mkf-uninstall.sh from /usr/local/bin
+    Removed mkf from /usr/local/bin
+    Removed mkf-functions.sh from /usr/local/bin
+mkf successfully uninstalled.
+```
+
+## Contributing
+
+`mkf` is an open-source project; community contributions are welcome.
+
+If you want to improve this script or add new features, feel free to open a pull request.
 
 ## License
 
-Apache 2.0. See `LICENSE`.
+Apache 2.0. See [License](https://github.com/Julien-Fischer/cmd-mkf/blob/master/LICENSE).

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Copyright 2024 Julien Fischer
 #
@@ -14,9 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+INITIAL_DIR=$(dirname "$(realpath "$0")")
+source "${INITIAL_DIR}/mkf-functions.sh"
+
 # Constants
-VERSION="0.3.0"
-RELEASE_DATE="2024-09-20"
+VERSION="0.4.0"
+RELEASE_DATE="2024-09-22"
 SCRIPT_NAME=$(basename "$0")
 
 # Default values
@@ -25,6 +29,7 @@ directory="."
 extension=''
 content=''
 software=
+template_name=
 auto_open=0
 datetime=0
 
@@ -36,32 +41,34 @@ function show_help {
     echo
     echo "Usage:"
     echo ""
-    echo "  ${SCRIPT_NAME} [filename] [-cdeot][-ihv]"
+    echo "  ${SCRIPT_NAME} [filename] [-cdeotT][-ihv]"
     echo ""
     echo "Main operation mode:"
     echo ""
-    echo "  -c, --content=content      The content to write in this file"
-    echo "  -d, --directory=directory  The directory where the file will be generated"
-    echo "  -e, --extension=extension  Specify the desired extension (no extension by default)"
-    echo "  -o, --open[=software]      Automatically opens the file upon generation using default or specified software."
-    echo "  -t, --time                 Uses a datetime prefix instead of a date prefix."
+    echo "  -c, --content=content           The content to write in this file"
+    echo "  -d, --directory=directory       The directory where the file will be generated"
+    echo "  -e, --extension=extension       Specify the desired extension (no extension by default)"
+    echo "  -o, --open[=software]           Automatically opens the file upon generation using default or specified software."
+    echo "  -t, --time                      Uses a datetime prefix instead of a date prefix."
+    echo "  -T, --template=[template_name]  Initializes the file using the specified template"
     echo ""
     echo "Information output:"
     echo ""
-    echo "  -i, --info                 Provide info about this software: version, release date, author"
-    echo "  -h, --help                 Display this help message and exit"
-    echo "  -v, --version              Print the command version"
+    echo "  -i, --info                      Provide info about this software: version, release date, author"
+    echo "  -h, --help                      Display this help message and exit"
+    echo "  -v, --version                   Print the command version"
     echo ""
     echo "Examples:"
     echo ""
-    echo "  mkf                      # Generate a file using the current date as its name."
-    echo "  mkf -e log               # Generate a file with .log extension"
-    echo "  mkf hello.log            # Generate a file named hello with .log extension"
-    echo "  mkf hello.log -d ~/logs  # Generate a file in home/username/logs"
-    echo "  mkf -o                   # Generate a file and open it in its default software"
-    echo "  mkf -o vim               # Generate a file and open it in VIM"
-    echo "  sudo mkf -e log -d / -t  # Generate a file in the root directory with a datetime prefix and .log extension"
-    echo "  mkf -h                   # Display this message"
+    echo "  mkf                             # Generate a file using the current date as its name."
+    echo "  mkf -e log                      # Generate a file with .log extension"
+    echo "  mkf hello.log                   # Generate a file named hello with .log extension"
+    echo "  mkf hello.log -d ~/logs         # Generate a file in home/username/logs"
+    echo "  mkf -o                          # Generate a file and open it in its default software"
+    echo "  mkf -o vim                      # Generate a file and open it in VIM"
+    echo "  sudo mkf -e log -d / -t         # Generate a file in the root directory with a datetime prefix and .log extension"
+    echo "  mkf hello -T meeting            # Generate a file named 'hello' from the 'meeting' template"
+    echo "  mkf -h                          # Display this message"
 }
 
 function print_version {
@@ -90,8 +97,18 @@ function create_file {
     else
         > $formatted_filename
     fi
+    if [[ -n "${template_name}" ]]; then
+        local template_file="${TARGET_TEMPLATE_DIR}/${template_name}"
+        if [[ ! -e "${template_file}" ]]; then
+            echo "${SCRIPT_NAME}: Could not find template ${template_name} in ${TARGET_TEMPLATE_DIR}"
+            list_templates "$TARGET_TEMPLATE_DIR" 'Found'
+            exit 1
+        fi
+        cat "${template_file}" >> "${formatted_filename}"
+    fi
     # Output results
     echo "created: ${formatted_filename} in: ${directory}"
+    [[ -n "${template_name}" ]] && echo "from template: ${template_name}"
     if [[ $auto_open -eq 1 ]]; then
         if [[ -z "$software" ]]; then
             # use default software to open the file
@@ -154,6 +171,14 @@ while [[ $# -gt 0 ]]; do
             content="$2"
             shift 2
             ;;
+        --template=*)
+            template_name="${1#*=}"
+            shift
+            ;;
+        -T)
+            template_name="$2"
+            shift 2
+            ;;
         --open)
             auto_open=1
             if [[ -n "${software}" && "${software}" != -* ]]; then
@@ -192,6 +217,7 @@ while [[ $# -gt 0 ]]; do
         -i|--info)
             print_version
             echo "Author: Julien Fischer <julien.fischer@agiledeveloper.net>"
+            echo "Repository: https://github.com/julien-Fischer/cmd-mkf"
             echo "For help, use ${SCRIPT_NAME} --help or ${SCRIPT_NAME} -h"
             exit 0
             ;;
