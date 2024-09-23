@@ -15,12 +15,43 @@
 # limitations under the License.
 
 
-set -Eeuo pipefail
+set -Euo pipefail
 
 
 ########################################################################
-# Uninstall process
+# Input parameters
 ########################################################################
+
+quiet=-1
+delete_custom_templates=0
+
+if [[ $# -gt 0 && "$1" = '-q' ]]; then
+    quiet=1
+fi
+
+if [[ $# -gt 0 && "$1" != '-q' && "$2" = '-y' ]]; then
+    delete_custom_templates=1
+fi
+
+########################################################################
+# Functions & lib
+########################################################################
+
+function delete_target {
+    local path="${1}"
+    local target="${2}"
+    if [[ -e "${path}" ]]; then
+        sudo rm "${path}"
+        [[ $quiet -ne 1 ]] && echo "    - Removed ${target} from ${INSTALL_DIR}"
+    fi
+}
+
+function source_lib {
+    source "${INITIAL_DIR}/mkf-functions.sh" || {
+        echo "Failed to source mkf-functions.sh from INITIAL_DIR"
+        exit 1
+    }
+}
 
 # Provide a default value if INSTALL_DIR is unbound via parameter expansion
 INSTALL_DIR="${INSTALL_DIR:-}"
@@ -28,56 +59,49 @@ INSTALL_DIR="${INSTALL_DIR:-}"
 # Attempt to source the file from INSTALL_DIR; otherwise use INITIAL_DIR
 if [[ -z "$INSTALL_DIR" || ! -f "${INSTALL_DIR}/mkf-functions.sh" ]]; then
     INITIAL_DIR=$(dirname "$(realpath "$0")")
-    source "${INITIAL_DIR}/mkf-functions.sh" || {
-        echo "Failed to source mkf-functions.sh from INITIAL_DIR"
-        exit 1
-    }
-else
-    source "${INSTALL_DIR}/mkf-functions.sh" || {
-        echo "Failed to source mkf-functions.sh from INSTALL_DIR"
-        exit 1
-    }
-fi
-
-quiet=0
-if [[ $# -gt 0 && "$1" = '-q' ]]; then
-    quiet=1
+    source_lib
 fi
 
 ########################################################################
 # Uninstall process
 ########################################################################
 
-if [[ $quiet -eq 0 ]]; then
+if [[ $quiet -ne 1 ]]; then
     echo "This will uninstall mkf."
-    confirm "Uninstallation" "Are you sure you want to proceed?"
+    confirm "Uninstallation" "Are you sure you want to proceed?" --abort
     echo "Uninstalling..."
 fi
 
 # Remove templates from $TARGET_TEMPLATE_DIR if exists
 if [[ -d "${TARGET_TEMPLATE_DIR}" ]]; then
-    [[ $quiet -eq 0 ]] && list_templates "${TARGET_TEMPLATE_DIR}" "  Removing"
-    sudo rm -r "${ROOT_TEMPLATE_DIR}"
+    if [[ -e "${NATIVE_TEMPLATES_PATH}" ]]; then
+        confirm "  Custom template deletion" "  Do you wish to keep your custom templates?"
+        delete_custom_templates=$?
+        [[ $quiet -ne 1 ]] && echo "  Keeping custom templates."
+        if [[ $delete_custom_templates -eq 0 ]]; then
+            while IFS= read -r filename; do
+                [[ $quiet -ne 1 ]] && echo "    - Removed ${filename} from ${TARGET_TEMPLATE_DIR}"
+                [[ $quiet -ne 1 ]] && sudo rm -f "/${TARGET_TEMPLATE_DIR}/${filename}"
+            done < "${NATIVE_TEMPLATES_PATH}"
+        fi
+        sudo rm "${NATIVE_TEMPLATES_PATH}"
+    fi
+    if [[ $delete_custom_templates -eq 1 ]]; then
+        [[ $quiet -ne 1 ]] && echo "  Removing custom templates..."
+        [[ $quiet -ne 1 ]] && list_templates "${TARGET_TEMPLATE_DIR}" "  Detected"
+        sudo rm -r "${ROOT_TEMPLATE_DIR}"
+    fi
 fi
 
 # Remove command from $INSTALL_DIR if exists
-[[ $quiet -eq 0 ]] && echo "  Removing command files..."
+[[ $quiet -ne 1 ]] && echo "  Removing command files..."
 if [[ -d "${INSTALL_DIR}" ]]; then
-    if [[ -e "${UNINSTALL_PATH}" ]]; then
-        sudo rm "${UNINSTALL_PATH}"
-        [[ $quiet -eq 0 ]] && echo "    Removed ${UNINSTALL_NAME} from ${INSTALL_DIR}"
-    fi
-    if [[ -e "${EXECUTABLE_PATH}" ]]; then
-        sudo rm "${EXECUTABLE_PATH}"
-        [[ $quiet -eq 0 ]] && echo "    Removed ${SCRIPT_NAME} from ${INSTALL_DIR}"
-    fi
-    if [[ -e "${LIB_PATH}" ]]; then
-        sudo rm "${LIB_PATH}"
-        [[ $quiet -eq 0 ]] && echo "    Removed ${LIB_NAME} from ${INSTALL_DIR}"
-    fi
+    delete_target "${UNINSTALL_PATH}" "${UNINSTALL_NAME}"
+    delete_target "${EXECUTABLE_PATH}" "${SCRIPT_NAME}"
+    delete_target "${LIB_PATH}" "${LIB_NAME}"
 fi
 
 # Exit the uninstall script
-if [[ $quiet -eq 0 ]]; then
+if [[ $quiet -ne 1 ]]; then
     echo "${SCRIPT_NAME} successfully uninstalled."
 fi

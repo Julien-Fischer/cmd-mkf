@@ -35,7 +35,7 @@ Main operation mode:
   -e, --extension=extension       Specify the desired extension (no extension by default)
   -o, --open[=software]           Automatically opens the file upon generation using default or specified software.
   -t, --time                      Uses a datetime prefix instead of a date prefix.
-  -T, --template=[template_name]  Initializes the file using the specified template
+  -T, --template=template_name    Initializes the file using the specified template
   
 Information output:
   
@@ -59,7 +59,7 @@ created: 2024-09-15 in: /home/username/Desktop
 created: 2024-09-15_11-32-54 in: /home/username/Desktop
 ```
 
-#### Create a file with default title and .log extension
+#### Create a file with default title and .txt extension
 ```
 ➜ mkf -e txt
 created: 2024-09-15.txt in: /home/username/Desktop
@@ -88,15 +88,19 @@ created: 2024-09-15_important-meeting.log in: /home/username/meetings
 
 ## Install
 
-### Using the Installer
-
-1. Download or clone this repository: `git clone https://github.com/Julien-Fischer/cmd-mkf`.
-2. Execute the installer `cd cmd-mkf/src; ./install.sh`
-3. Confirm `mkf` is installed:
-
+1. Download or clone this repository:
 ```
-➜ mkf -v
-mkf version 0.4.0 [2024-09-22]
+git clone https://github.com/Julien-Fischer/cmd-mkf
+```
+
+2. Execute the installer
+```
+cd cmd-mkf/src; ./install.sh
+```
+
+3. Confirm `mkf` is installed:
+```
+mkf -v
 ```
 
 ## Uninstall

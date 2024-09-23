@@ -24,9 +24,11 @@ export LIB_NAME='mkf-functions.sh'
 export UNINSTALL_NAME='mkf-uninstall.sh'
 export INSTALL_DIR="/usr/local/bin"
 export ROOT_TEMPLATE_DIR="/usr/local/share/${SCRIPT_NAME}"
+export NATIVE_TEMPLATES_NAME='native_templates'
 export TARGET_TEMPLATE_DIR="${ROOT_TEMPLATE_DIR}/templates"
 export EXECUTABLE_PATH="${INSTALL_DIR}/${SCRIPT_NAME}"
 export UNINSTALL_PATH="${INSTALL_DIR}/${UNINSTALL_NAME}"
+export NATIVE_TEMPLATES_PATH="${INSTALL_DIR}/${NATIVE_TEMPLATES_NAME}"
 export LIB_PATH="${INSTALL_DIR}/${LIB_NAME}"
 
 ########################################################################
@@ -45,6 +47,10 @@ function list_templates {
 }
 
 function confirm() {
+    local abort=0
+    if [[ $# -ge 3 && "$3" == "--abort" ]]; then
+        abort=1
+    fi
     echo -n "$2 (y/n): "
     read answer
     case $answer in
@@ -53,7 +59,35 @@ function confirm() {
             ;;
         *)
             echo "$1 aborted."
-            exit 1
+            if [[ abort -eq 1 ]]; then
+                exit 1
+            fi
+            return 1
             ;;
     esac
+}
+
+# Write the file names in the specified directory in a file with the specified name
+function write_files {
+    local directory="$1"
+    local output_file="$2"
+    if [[ ! -d "${directory}" ]]; then
+        echo "${SCRIPT_NAME}: Invalid directory: ${directory}"
+        return 1
+    fi
+
+    declare -a files=()
+    for file in "${directory}"/*; do
+      if [[ -f "${file}" ]]; then
+          filename=$(basename "${file}")
+          files+=("${filename}")
+      fi
+    done
+
+    # clear the output file before writing
+    > "${output_file}"
+
+    for file in "${files[@]}"; do
+        echo "${file}" >> "${output_file}"
+    done
 }

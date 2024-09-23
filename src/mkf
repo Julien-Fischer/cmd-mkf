@@ -19,8 +19,8 @@ INITIAL_DIR=$(dirname "$(realpath "$0")")
 source "${INITIAL_DIR}/mkf-functions.sh"
 
 # Constants
-VERSION="0.4.0"
-RELEASE_DATE="2024-09-22"
+VERSION="0.5.0"
+RELEASE_DATE="2024-09-23"
 SCRIPT_NAME=$(basename "$0")
 
 # Default values
@@ -41,7 +41,7 @@ function show_help {
     echo
     echo "Usage:"
     echo ""
-    echo "  ${SCRIPT_NAME} [filename] [-cdeotT][-ihv]"
+    echo "  ${SCRIPT_NAME} [filename] [-cdeotT][-hiv]"
     echo ""
     echo "Main operation mode:"
     echo ""
@@ -50,7 +50,8 @@ function show_help {
     echo "  -e, --extension=extension       Specify the desired extension (no extension by default)"
     echo "  -o, --open[=software]           Automatically opens the file upon generation using default or specified software."
     echo "  -t, --time                      Uses a datetime prefix instead of a date prefix."
-    echo "  -T, --template=[template_name]  Initializes the file using the specified template"
+    echo "  -T, --template=template_name    Initializes the file using the specified template"
+    echo "                                  To modify or add new templates, navigate to ${TARGET_TEMPLATE_DIR}"
     echo ""
     echo "Information output:"
     echo ""
@@ -261,14 +262,7 @@ fi
 
 
 if [[ -f "$formatted_filename" ]]; then
-    read -p "File '${formatted_filename}' already exists. Do you want to override it? (y/n): " choice
-    case "$choice" in
-        y|Y)
-            echo "Overriding existing file..."
-        ;;
-        n|N) echo "Operation aborted."; exit 1;;
-        *) echo "Invalid input. Operation aborted."; exit 1;;
-    esac
+    confirm "Operation" "File '${formatted_filename}' already exists. Do you want to override it?" --abort
 fi;
 
 create_file

@@ -22,7 +22,7 @@ source "${INITIAL_DIR}/mkf-functions.sh"
 
 # Make the install script idempotent by removing older versions of mkf
 if [[ -e 'mkf-uninstall.sh' ]]; then
-    ./mkf-uninstall.sh -q
+    ./mkf-uninstall.sh -q -y
 fi
 
 ########################################################################
@@ -37,7 +37,7 @@ SOURCE_TEMPLATE_DIR="$(dirname "$INSTALL_SCRIPT_DIR")/templates"
 ########################################################################
 
 echo "This will install mkf."
-confirm "Installation" "Are you sure you want to proceed?"
+confirm "Installation" "Are you sure you want to proceed?" --abort
 echo "Installing..."
 
 # Create $INSTALL_DIR if not exists
@@ -55,6 +55,10 @@ sudo chmod +x "${EXECUTABLE_PATH}"
 echo "  Command executable installed."
 
 echo "  Installing templates..."
+# Remember native templates
+write_files "${SOURCE_TEMPLATE_DIR}" "${NATIVE_TEMPLATES_NAME}"
+sudo mv "${NATIVE_TEMPLATES_NAME}" "${INSTALL_DIR}"
+
 # Create the template directory if not exists
 if [[ ! -d "${TARGET_TEMPLATE_DIR}" ]]; then
     sudo mkdir -p "${TARGET_TEMPLATE_DIR}"
