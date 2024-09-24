@@ -15,6 +15,20 @@
 # limitations under the License.
 
 
+########################################################################
+# Input parameters
+########################################################################
+
+quiet=-1
+
+if [[ $# -gt 0 && "$1" = '-q' ]]; then
+    quiet=1
+fi
+
+########################################################################
+# Prepare installation
+########################################################################
+
 set -Eeuo pipefail
 
 INITIAL_DIR=$(dirname "$(realpath "$0")")
@@ -36,8 +50,10 @@ SOURCE_TEMPLATE_DIR="$(dirname "$INSTALL_SCRIPT_DIR")/templates"
 # Installation process
 ########################################################################
 
-echo "This will install mkf."
-confirm "Installation" "Are you sure you want to proceed?" --abort
+if [[ $quiet -ne 1 ]]; then
+    echo "This will install mkf."
+    confirm "Installation" "Are you sure you want to proceed?" --abort
+fi
 echo "Installing..."
 
 # Create $INSTALL_DIR if not exists

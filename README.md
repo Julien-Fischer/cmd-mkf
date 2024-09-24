@@ -95,7 +95,7 @@ git clone https://github.com/Julien-Fischer/cmd-mkf
 
 2. Execute the installer
 ```
-cd cmd-mkf/src; ./install.sh
+cmd-mkf/src/install.sh
 ```
 
 3. Confirm `mkf` is installed:
@@ -115,6 +115,10 @@ To remove `mkf`, run the uninstallation wizard.
 `mkf` is an open-source project; community contributions are welcome.
 
 If you want to improve this script or add new features, feel free to open a pull request.
+
+## Run Tests
+
+[TODO: write...]
 
 ## License
 

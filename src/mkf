@@ -19,8 +19,8 @@ INITIAL_DIR=$(dirname "$(realpath "$0")")
 source "${INITIAL_DIR}/mkf-functions.sh"
 
 # Constants
-VERSION="0.6.0"
-RELEASE_DATE="2024-09-24"
+VERSION="0.7.0"
+RELEASE_DATE="2024-09-28"
 SCRIPT_NAME=$(basename "$0")
 
 # Default values
@@ -70,6 +70,13 @@ function show_help {
     echo "  sudo mkf -e log -d / -t         # Generate a file in the root directory with a datetime prefix and .log extension"
     echo "  mkf hello -T meeting            # Generate a file named 'hello' from the 'meeting' template"
     echo "  mkf -h                          # Display this message"
+}
+
+function print_about {
+    print_version
+    echo "Author: Julien Fischer <julien.fischer@agiledeveloper.net>"
+    echo "Repository: https://github.com/julien-Fischer/cmd-mkf"
+    echo "For help, use ${SCRIPT_NAME} --help or ${SCRIPT_NAME} -h"
 }
 
 function print_version {
@@ -219,10 +226,7 @@ while [[ $# -gt 0 ]]; do
             exit 0
             ;;
         -i|--info)
-            print_version
-            echo "Author: Julien Fischer <julien.fischer@agiledeveloper.net>"
-            echo "Repository: https://github.com/julien-Fischer/cmd-mkf"
-            echo "For help, use ${SCRIPT_NAME} --help or ${SCRIPT_NAME} -h"
+            print_about
             exit 0
             ;;
         *)  # Catch-all for invalid options
@@ -265,7 +269,7 @@ fi
 
 
 if [[ -f "$formatted_filename" ]]; then
-    confirm "Operation" "File '${formatted_filename}' already exists. Do you want to override it?" --abort
+    confirm "Operation" "File '${formatted_filename}' already exists in ${directory}. Do you want to override it?" --abort
 fi;
 
 create_file
