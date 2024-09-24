@@ -19,8 +19,8 @@ INITIAL_DIR=$(dirname "$(realpath "$0")")
 source "${INITIAL_DIR}/mkf-functions.sh"
 
 # Constants
-VERSION="0.5.0"
-RELEASE_DATE="2024-09-23"
+VERSION="0.6.0"
+RELEASE_DATE="2024-09-24"
 SCRIPT_NAME=$(basename "$0")
 
 # Default values
@@ -183,10 +183,12 @@ while [[ $# -gt 0 ]]; do
         --open)
             auto_open=1
             if [[ -n "${software}" && "${software}" != -* ]]; then
-              software="$2"
-              shift 2
+                echo "${SCRIPT_NAME}: Invalid option: $1"
+                echo
+                show_help
+                exit 1
             else
-              shift
+                shift
             fi
             ;;
         --open=*)
@@ -197,10 +199,11 @@ while [[ $# -gt 0 ]]; do
         -o)
             auto_open=1
             software="$2"
-            if [[ -n "$2" && "$2" != -* ]]; then
-              shift 2
+            if [[ -n "${software}" && "${software}" != -* ]]; then
+                shift 2
             else
-              shift
+              software=
+                shift
             fi
             ;;
         -t|--time)

@@ -67,7 +67,24 @@ function confirm() {
     esac
 }
 
-# Write the file names in the specified directory in a file with the specified name
+# Retrieves the names of the files in the specified directory
+# arg $1  the path directory
+# arg $2  the name of the array to use for storing the file names
+function get_file_names {
+    local directory="$1"
+    local -n file_array="$2"  # nameref to the array passed as argument
+    for file in "${directory}"/*; do
+        if [[ -f "${file}" ]]; then
+            filename=$(basename "${file}")
+            file_array+=("${filename}")
+        fi
+    done
+}
+
+# Write the names of the files from a directory in the specified file.
+# If the file does not exist, this function will create it
+# arg $1  the path of the directory to scan
+# arg $2  the name of the file to write to
 function write_files {
     local directory="$1"
     local output_file="$2"
@@ -76,13 +93,8 @@ function write_files {
         return 1
     fi
 
-    declare -a files=()
-    for file in "${directory}"/*; do
-      if [[ -f "${file}" ]]; then
-          filename=$(basename "${file}")
-          files+=("${filename}")
-      fi
-    done
+    local -a files=()
+    get_file_names "${directory}" files
 
     # clear the output file before writing
     > "${output_file}"

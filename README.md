@@ -107,18 +107,7 @@ mkf -v
 
 To remove `mkf`, run the uninstallation wizard.
 ```
-➜ cd /usr/local/bin; ./mkf-uninstall.sh
-This will uninstall mkf.
-Are you sure you want to proceed? (y/n): y
-Uninstalling...
-  Removing 2 templates:
-  - log
-  - meeting
-  Removing command files...
-    Removed mkf-uninstall.sh from /usr/local/bin
-    Removed mkf from /usr/local/bin
-    Removed mkf-functions.sh from /usr/local/bin
-mkf successfully uninstalled.
+/usr/local/bin/mkf-uninstall.sh
 ```
 
 ## Contributing

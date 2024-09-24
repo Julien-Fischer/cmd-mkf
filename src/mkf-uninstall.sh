@@ -75,9 +75,16 @@ fi
 # Remove templates from $TARGET_TEMPLATE_DIR if exists
 if [[ -d "${TARGET_TEMPLATE_DIR}" ]]; then
     if [[ -e "${NATIVE_TEMPLATES_PATH}" ]]; then
-        confirm "  Custom template deletion" "  Do you wish to keep your custom templates?"
+        native_templates_count=$(grep -cve '^\s*$' "${NATIVE_TEMPLATES_PATH}")
+        declare -a templates_names=()
+        get_file_names "${TARGET_TEMPLATE_DIR}" templates_names
+        templates_count=${#templates_names[@]}
+        custom_templates_count=$((templates_count - native_templates_count))
+        [[ $quiet -ne 1 ]] && echo "  Detected ${custom_templates_count} custom templates."
+        [[ $quiet -ne 1 ]] && confirm "  Custom template deletion" "  Do you wish to keep your custom templates?"
         delete_custom_templates=$?
-        [[ $quiet -ne 1 ]] && echo "  Keeping custom templates."
+        [[ $quiet -ne 1 ]] && echo "  Keeping your custom templates."
+        [[ $quiet -ne 1 ]] && echo "  Removing native templates..."
         if [[ $delete_custom_templates -eq 0 ]]; then
             while IFS= read -r filename; do
                 [[ $quiet -ne 1 ]] && echo "    - Removed ${filename} from ${TARGET_TEMPLATE_DIR}"
