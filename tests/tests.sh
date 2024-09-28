@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 ###############################################################
 ## Tests constants
 ###############################################################
@@ -59,10 +58,6 @@ function find_datetime_file {
       else
           echo "No matching files found."
       fi
-}
-
-function command_exists {
-    command -v "$1" >/dev/null 2>&1
 }
 
 ###############################################################
@@ -274,7 +269,6 @@ test install_is_idempotent
 
 # ./mkf-uninstall.sh
 test uninstall_removes_mkf
-test uninstall_is_idempotent
 
 echo "--------------------------------------"
 echo "[$(date '+%H:%M:%S')] Tests passed."

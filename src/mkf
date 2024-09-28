@@ -14,13 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 INITIAL_DIR=$(dirname "$(realpath "$0")")
 source "${INITIAL_DIR}/mkf-functions.sh"
 
 # Constants
-VERSION="0.7.0"
-RELEASE_DATE="2024-09-28"
+VERSION="0.7.1"
+RELEASE_DATE="2024-09-29"
 SCRIPT_NAME=$(basename "$0")
 
 # Default values

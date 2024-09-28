@@ -1,7 +1,7 @@
 # mkf (make file)
 
 Save time by generating timestamped and preformatted files for your meeting minutes, logs, etc.
-This command is design to be simple to use and easily adaptable to your specific needs.
+This command is designed to be simple to use and easily adaptable to your specific needs.
 
 ## Features
 
@@ -11,8 +11,7 @@ This command is design to be simple to use and easily adaptable to your specific
 
 ## Customization
 
-You can customize the templates used by the script or create your own by adding them in the `/usr/local/share/mkf/templates` directory.
-
+You can customize the templates used by the script or create your own by adding them to the `/usr/local/share/mkf/templates` directory.
 
 ## Prerequisites
 
@@ -43,7 +42,6 @@ Information output:
   -i, --info                      Provide info about this software: version, release date, author
   -v, --version                   Print the command version
 ```
-
 
 ## Examples
 
@@ -116,9 +114,8 @@ To remove `mkf`, run the uninstallation wizard.
 
 If you want to improve this script or add new features, feel free to open a pull request.
 
-## Run Tests
-
-[TODO: write...]
+Please refer to [Contributing to mkf](https://github.com/Julien-Fischer/cmd-mkf/blob/master/CONTRIBUTING.md) for 
+more details.
 
 ## License
 
